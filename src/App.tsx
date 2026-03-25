@@ -556,12 +556,12 @@ const Navbar = () => {
       )}
     >
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-        <div className="font-mono text-xl font-bold tracking-tighter flex items-center gap-2">
-          <span className="text-neon-cyan">&lt;</span>
+        <div className="font-mono text-xl font-bold tracking-tighter flex items-center gap-2 group cursor-pointer">
+          <span className="text-neon-cyan transition-transform duration-300 group-hover:-translate-x-1">&lt;</span>
           <span className="text-white">Akash</span>
-          <span className="text-neon-purple">/&gt;</span>
+          <span className="text-neon-purple transition-transform duration-300 group-hover:translate-x-1">/&gt;</span>
         </div>
-        <div className="hidden md:flex items-center gap-8 font-mono text-xs uppercase tracking-widest">
+        <div className="hidden md:flex items-center gap-10 font-mono text-[10px] uppercase tracking-[0.2em] font-medium">
           {['Services', 'Capabilities', 'Process', 'Work', 'Reviews', 'FAQ'].map((item) => (
             <a 
               key={item} 
@@ -604,29 +604,29 @@ const Hero = () => {
           animate="visible"
           className="space-y-8 pointer-events-auto"
         >
-          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel text-neon-cyan font-mono text-xs uppercase tracking-widest">
-            <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse" />
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-3 px-5 py-2 rounded-full glass-panel text-neon-cyan font-mono text-[10px] uppercase tracking-[0.2em] font-semibold border-white/10">
+            <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse shadow-[0_0_10px_rgba(0,243,255,0.5)]" />
             System Initialized
           </motion.div>
           
-          <motion.h1 variants={itemVariants} className="text-6xl md:text-8xl font-bold font-display leading-[1.1] tracking-tighter">
-            <span className="block text-gray-400 text-2xl md:text-3xl mb-4 font-mono tracking-normal font-normal">Hi, I'm Akash. I build</span>
+          <motion.h1 variants={itemVariants} className="text-7xl md:text-[120px] font-bold font-display leading-[0.85] tracking-[-0.05em]">
+            <span className="block text-gray-500 text-xl md:text-2xl mb-8 font-mono tracking-widest font-normal uppercase">Hi, I'm Akash. I build</span>
             <TextReveal text="Websites That" className="text-white" />
             <br />
             <TextReveal text="Grow Businesses" className="text-gradient" />
           </motion.h1>
           
-          <motion.p variants={itemVariants} className="text-xl text-gray-400 max-w-lg leading-relaxed font-light">
+          <motion.p variants={itemVariants} className="text-lg md:text-xl text-gray-400 max-w-lg leading-relaxed font-light tracking-wide">
             I help businesses and individuals establish a powerful online presence. From custom landing pages to full-scale web applications, I build fast, modern websites that convert visitors into customers.
           </motion.p>
           
-          <motion.div variants={itemVariants} className="flex flex-wrap gap-6 pt-4">
-            <MagneticButton href="#work" className="px-8 py-4 glass-panel rounded-full font-mono text-sm uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center gap-3 group">
-              <Code size={16} className="text-neon-cyan group-hover:rotate-12 transition-transform" />
+          <motion.div variants={itemVariants} className="flex flex-wrap gap-6 pt-8">
+            <MagneticButton href="#work" className="px-10 py-5 glass-panel rounded-full font-mono text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-white/10 transition-all duration-300 flex items-center gap-3 group border-white/10">
+              <Code size={14} className="text-neon-cyan group-hover:rotate-12 transition-transform" />
               View My Work
             </MagneticButton>
-            <MagneticButton href="#contact" className="px-8 py-4 border border-white/10 rounded-full font-mono text-sm uppercase tracking-widest hover:border-neon-purple hover:text-neon-purple transition-colors flex items-center gap-3">
-              <Terminal size={16} />
+            <MagneticButton href="#contact" className="px-10 py-5 border border-white/10 rounded-full font-mono text-[11px] uppercase tracking-[0.2em] font-bold hover:border-neon-purple hover:text-neon-purple transition-all duration-300 flex items-center gap-3">
+              <Terminal size={14} />
               Get a Free Quote
             </MagneticButton>
           </motion.div>
@@ -666,9 +666,9 @@ const Services = () => {
   return (
     <section id="services" className="py-32 relative z-10 pointer-events-none">
       <div className="max-w-7xl mx-auto px-6 pointer-events-auto">
-        <div className="mb-20 text-center">
-          <TextReveal text="What I Offer" className="text-4xl md:text-6xl font-bold font-display mb-6 text-gradient" />
-          <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">Digital Solutions</p>
+        <div className="mb-24 text-center">
+          <TextReveal text="What I Offer" className="text-5xl md:text-8xl font-bold font-display mb-8 text-gradient tracking-tighter" />
+          <p className="text-gray-500 font-mono text-[10px] uppercase tracking-[0.3em] font-medium">Digital Solutions & Strategy</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -747,9 +747,9 @@ const Capabilities = () => {
   return (
     <section id="capabilities" className="py-32 relative z-10 pointer-events-none">
       <div className="max-w-7xl mx-auto px-6 pointer-events-auto">
-        <div className="mb-20 text-center">
-          <TextReveal text="Developer Arsenal" className="text-4xl md:text-6xl font-bold font-display mb-6 text-gradient" />
-          <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">Beyond standard web development</p>
+        <div className="mb-24 text-center">
+          <TextReveal text="Developer Arsenal" className="text-5xl md:text-8xl font-bold font-display mb-8 text-gradient tracking-tighter" />
+          <p className="text-gray-500 font-mono text-[10px] uppercase tracking-[0.3em] font-medium">Beyond standard web development</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(280px,auto)]">
@@ -814,9 +814,9 @@ const Process = () => {
   return (
     <section id="process" className="py-32 relative z-10 bg-black/20 border-y border-white/5 pointer-events-none">
       <div className="max-w-4xl mx-auto px-6 pointer-events-auto">
-        <div className="mb-20">
-          <TextReveal text="How It Works" className="text-4xl md:text-6xl font-bold font-display mb-6 text-gradient" />
-          <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">The Process</p>
+        <div className="mb-24">
+          <TextReveal text="How It Works" className="text-5xl md:text-8xl font-bold font-display mb-8 text-gradient tracking-tighter" />
+          <p className="text-gray-500 font-mono text-[10px] uppercase tracking-[0.3em] font-medium">The Strategic Process</p>
         </div>
 
         <div className="space-y-12 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
@@ -871,9 +871,9 @@ const SourceCode = () => {
     <section id="source" className="py-32 relative z-10 overflow-hidden pointer-events-none">
       <BinaryRain />
       <div className="max-w-4xl mx-auto px-6 relative z-10 pointer-events-auto">
-        <div className="mb-20 text-center">
-          <TextReveal text="The Blueprint" className="text-4xl md:text-6xl font-bold font-display mb-6 text-gradient" />
-          <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">Built For Success</p>
+        <div className="mb-24 text-center">
+          <TextReveal text="The Blueprint" className="text-5xl md:text-8xl font-bold font-display mb-8 text-gradient tracking-tighter" />
+          <p className="text-gray-500 font-mono text-[10px] uppercase tracking-[0.3em] font-medium">Engineered For Success</p>
         </div>
         
         <TiltCard className="p-0 overflow-hidden bg-[#0a0a0f]/90 border-white/10 backdrop-blur-2xl">
@@ -938,12 +938,12 @@ const Projects = () => {
   return (
     <section id="work" className="py-32 relative z-10 bg-black/20 border-y border-white/5 pointer-events-none">
       <div className="max-w-7xl mx-auto px-6 pointer-events-auto">
-        <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div>
-            <TextReveal text="Recent Client Work" className="text-4xl md:text-6xl font-bold font-display mb-6 text-gradient" />
-            <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">Success Stories</p>
+            <TextReveal text="Recent Work" className="text-5xl md:text-8xl font-bold font-display mb-8 text-gradient tracking-tighter" />
+            <p className="text-gray-500 font-mono text-[10px] uppercase tracking-[0.3em] font-medium">Success Stories & Case Studies</p>
           </div>
-          <MagneticButton className="px-6 py-3 border border-white/10 rounded-full font-mono text-xs uppercase tracking-widest hover:bg-white/5 flex items-center gap-2">
+          <MagneticButton className="px-8 py-4 border border-white/10 rounded-full font-mono text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-white/5 transition-all duration-300 flex items-center gap-2">
             View All Projects <ArrowRight size={14} />
           </MagneticButton>
         </div>
@@ -1040,9 +1040,9 @@ const Testimonials = () => {
   return (
     <section id="reviews" className="py-32 relative z-10 pointer-events-none">
       <div className="max-w-7xl mx-auto px-6 pointer-events-auto">
-        <div className="mb-20 text-center">
-          <TextReveal text="Client Feedback" className="text-4xl md:text-6xl font-bold font-display mb-6 text-gradient" />
-          <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">Word on the street</p>
+        <div className="mb-24 text-center">
+          <TextReveal text="Client Feedback" className="text-5xl md:text-8xl font-bold font-display mb-8 text-gradient tracking-tighter" />
+          <p className="text-gray-500 font-mono text-[10px] uppercase tracking-[0.3em] font-medium">Word on the digital street</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {reviews.map((review, i) => (
@@ -1096,9 +1096,9 @@ const FAQ = () => {
   return (
     <section id="faq" className="py-32 relative z-10 pointer-events-none">
       <div className="max-w-4xl mx-auto px-6 pointer-events-auto">
-        <div className="mb-20 text-center">
-          <TextReveal text="Query Database" className="text-4xl md:text-6xl font-bold font-display mb-6 text-gradient" />
-          <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">Frequently Asked Questions</p>
+        <div className="mb-24 text-center">
+          <TextReveal text="Query Database" className="text-5xl md:text-8xl font-bold font-display mb-8 text-gradient tracking-tighter" />
+          <p className="text-gray-500 font-mono text-[10px] uppercase tracking-[0.3em] font-medium">Frequently Asked Questions</p>
         </div>
 
         <div className="space-y-4">
@@ -1160,21 +1160,21 @@ const Contact = () => {
           viewport={{ once: true }}
           className="glass-panel p-12 md:p-24 rounded-3xl"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neon-purple/10 border border-neon-purple/30 text-neon-purple font-mono text-xs uppercase tracking-widest mb-8">
-            <span className="w-2 h-2 rounded-full bg-neon-purple animate-pulse" />
-            Available For Projects
+          <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-neon-purple/10 border border-neon-purple/30 text-neon-purple font-mono text-[10px] uppercase tracking-[0.2em] font-bold mb-10">
+            <span className="w-2 h-2 rounded-full bg-neon-purple animate-pulse shadow-[0_0_10px_rgba(188,19,254,0.5)]" />
+            Available For New Projects
           </div>
           
-          <h2 className="text-5xl md:text-7xl font-bold font-display mb-8">
+          <h2 className="text-5xl md:text-[100px] font-bold font-display mb-10 leading-[0.85] tracking-[-0.05em]">
             Ready to Grow <br/><span className="text-gradient">Your Business?</span>
           </h2>
           
-          <p className="text-gray-400 text-lg max-w-xl mx-auto mb-12 font-light">
+          <p className="text-gray-400 text-lg md:text-xl max-w-xl mx-auto mb-16 font-light leading-relaxed tracking-wide">
             Whether you need a brand new website or a redesign of your current one, I'm here to help. 
             Let's discuss your goals and how we can achieve them.
           </p>
           
-          <MagneticButton href="mailto:sahakash2007777@gmail.com" className="px-10 py-5 bg-white text-black rounded-full font-mono text-sm uppercase tracking-widest hover:bg-gray-200 transition-colors flex items-center gap-3 mx-auto">
+          <MagneticButton href="mailto:sahakash2007777@gmail.com" className="px-12 py-6 bg-white text-black rounded-full font-mono text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-gray-200 transition-all duration-300 flex items-center gap-3 mx-auto shadow-[0_20px_40px_rgba(255,255,255,0.1)]">
             <Mail size={18} />
             Get Your Free Proposal
           </MagneticButton>
