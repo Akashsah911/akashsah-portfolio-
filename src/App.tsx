@@ -18,6 +18,7 @@ function cn(...inputs: ClassValue[]) {
 const CustomCursor = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
+  const [isClicking, setIsClicking] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -43,12 +44,19 @@ const CustomCursor = () => {
       setIsHovering(!!isInteractive);
     };
 
+    const handleMouseDown = () => setIsClicking(true);
+    const handleMouseUp = () => setIsClicking(false);
+
     window.addEventListener('mousemove', updateMousePosition);
     window.addEventListener('mouseover', handleMouseOver);
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
     
     return () => {
       window.removeEventListener('mousemove', updateMousePosition);
       window.removeEventListener('mouseover', handleMouseOver);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
     };
   }, []);
 
@@ -61,7 +69,7 @@ const CustomCursor = () => {
         animate={{
           x: mousePosition.x - 6,
           y: mousePosition.y - 6,
-          scale: isHovering ? 0 : 1,
+          scale: isClicking ? 0.5 : (isHovering ? 0 : 1),
         }}
         transition={{ type: 'tween', ease: 'backOut', duration: 0.1 }}
       />
@@ -70,10 +78,10 @@ const CustomCursor = () => {
         animate={{
           x: mousePosition.x - 20,
           y: mousePosition.y - 20,
-          scale: isHovering ? 1.5 : 1,
-          backgroundColor: isHovering ? 'rgba(0, 243, 255, 0.1)' : 'rgba(0, 243, 255, 0.05)',
+          scale: isClicking ? 0.8 : (isHovering ? 1.5 : 1),
+          backgroundColor: isClicking ? 'rgba(212, 175, 55, 0.3)' : (isHovering ? 'rgba(212, 175, 55, 0.1)' : 'rgba(212, 175, 55, 0.05)'),
         }}
-        transition={{ type: 'spring', stiffness: 150, damping: 15, mass: 0.5 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20, mass: 0.5 }}
       >
         {isHovering && <div className="w-1 h-1 bg-neon-cyan rounded-full" />}
       </motion.div>
@@ -84,6 +92,7 @@ const CustomCursor = () => {
 const MagneticButton = ({ children, className, onClick, href }: any) => {
   const ref = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
   
   const handleMouse = (e: React.MouseEvent) => {
     if (!ref.current) return;
@@ -94,19 +103,31 @@ const MagneticButton = ({ children, className, onClick, href }: any) => {
     setPosition({ x: middleX * 0.3, y: middleY * 0.3 });
   };
   
-  const reset = () => setPosition({ x: 0, y: 0 });
+  const reset = () => {
+    setPosition({ x: 0, y: 0 });
+    setIsHovered(false);
+  };
 
   const content = (
     <motion.div
       ref={ref}
       onMouseMove={handleMouse}
+      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={reset}
       animate={{ x: position.x, y: position.y }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
       transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-      className={cn("relative inline-flex items-center justify-center interactive", className)}
+      className={cn("relative inline-flex items-center justify-center interactive overflow-hidden", className)}
       onClick={onClick}
     >
-      {children}
+      <motion.div 
+        className="absolute inset-0 bg-neon-cyan/20 blur-xl rounded-full pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isHovered ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+      />
+      <span className="relative z-10 flex items-center gap-2">{children}</span>
     </motion.div>
   );
 
@@ -142,11 +163,46 @@ const TiltCard = ({ children, className }: any) => {
     >
       <motion.div 
         style={{ rotateX, rotateY }} 
-        className={cn("glass-panel p-8 rounded-2xl h-full transition-shadow duration-300 hover:shadow-[0_0_30px_rgba(0,243,255,0.15)]", className)}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className={cn("glass-panel p-8 rounded-2xl h-full transition-shadow duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)]", className)}
       >
         {children}
       </motion.div>
     </motion.div>
+  );
+};
+
+const GlowCard = ({ children, className, glowColor = "rgba(0, 243, 255, 0.15)" }: any) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  return (
+    <div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setOpacity(1)}
+      onMouseLeave={() => setOpacity(0)}
+      className={cn("relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 backdrop-blur-md", className)}
+    >
+      <div
+        className="pointer-events-none absolute -inset-px transition-opacity duration-300"
+        style={{
+          opacity,
+          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, ${glowColor}, transparent 40%)`,
+        }}
+      />
+      <div className="relative h-full w-full p-8 z-10 flex flex-col">
+        {children}
+      </div>
+    </div>
   );
 };
 
@@ -172,7 +228,7 @@ const TextReveal = ({ text, className }: { text: string, className?: string }) =
 
 // --- 3D Components ---
 
-const PixelEarth = () => {
+const PixelEarth = ({ onHoverChange }: { onHoverChange?: (hovered: boolean) => void }) => {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const materialRef = useRef<THREE.MeshBasicMaterial>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -184,6 +240,12 @@ const PixelEarth = () => {
   const targetColor = useMemo(() => new THREE.Color(), []);
   const baseColor = useMemo(() => new THREE.Color("#00f3ff").multiplyScalar(1.2), []);
   const hoverColor = useMemo(() => new THREE.Color("#00f3ff").multiplyScalar(2.5), []);
+
+  useEffect(() => {
+    if (onHoverChange) {
+      onHoverChange(hovered);
+    }
+  }, [hovered, onHoverChange]);
 
   useEffect(() => {
     const img = new Image();
@@ -266,6 +328,12 @@ const PixelEarth = () => {
     }
     
     if (groupRef.current) {
+      // Animate scale on mount (10% smaller than 1.4 = 1.26)
+      const targetScale = 1.26;
+      groupRef.current.scale.x = THREE.MathUtils.damp(groupRef.current.scale.x, targetScale, 2, delta);
+      groupRef.current.scale.y = THREE.MathUtils.damp(groupRef.current.scale.y, targetScale, 2, delta);
+      groupRef.current.scale.z = THREE.MathUtils.damp(groupRef.current.scale.z, targetScale, 2, delta);
+
       // Smoothly follow the mouse cursor
       const targetRotX = (state.pointer.y * Math.PI) / 8;
       const targetRotY = (state.pointer.x * Math.PI) / 8;
@@ -292,14 +360,13 @@ const PixelEarth = () => {
   const boxSize = isMobile ? 0.03 : 0.022;
 
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} scale={0}>
       <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.2}>
         {/* Invisible hit sphere for optimized raycasting (O(1) instead of O(N) for 15k boxes) */}
         <mesh 
           scale={1.55} 
           onPointerOver={() => setHover(true)}
           onPointerOut={() => setHover(false)}
-          visible={false}
         >
           <sphereGeometry args={[1, 16, 16]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
@@ -358,6 +425,8 @@ const Starfield = () => {
 };
 
 const BackgroundScene = () => {
+  const [isHoveringSphere, setIsHoveringSphere] = useState(false);
+
   return (
     <div className="fixed inset-0 z-0 pointer-events-auto touch-none">
       <Canvas 
@@ -371,15 +440,17 @@ const BackgroundScene = () => {
         <pointLight position={[10, -10, -5]} color="#00f3ff" intensity={2} />
         <Starfield />
         
-        <PixelEarth />
+        <PixelEarth onHoverChange={setIsHoveringSphere} />
         
         {/* Allow users to freely spin the globe with touch/mouse */}
         <OrbitControls 
-          enableZoom={false} 
+          enableZoom={isHoveringSphere} 
           enablePan={false} 
           enableRotate={true}
           enableDamping={true}
           dampingFactor={0.05}
+          minDistance={2}
+          maxDistance={20}
         />
         
         <EffectComposer>
@@ -491,7 +562,7 @@ const Navbar = () => {
           <span className="text-neon-purple">/&gt;</span>
         </div>
         <div className="hidden md:flex items-center gap-8 font-mono text-xs uppercase tracking-widest">
-          {['Services', 'Process', 'Work', 'Reviews', 'FAQ'].map((item) => (
+          {['Services', 'Capabilities', 'Process', 'Work', 'Reviews', 'FAQ'].map((item) => (
             <a 
               key={item} 
               href={`#${item.toLowerCase()}`}
@@ -508,32 +579,48 @@ const Navbar = () => {
 };
 
 const Hero = () => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.3
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" as any } }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center pt-20 overflow-hidden z-10 pointer-events-none">
-      <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center w-full pointer-events-auto">
+      <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center w-full pointer-events-none">
         <motion.div 
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="space-y-8"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-8 pointer-events-auto"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel text-neon-cyan font-mono text-xs uppercase tracking-widest">
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel text-neon-cyan font-mono text-xs uppercase tracking-widest">
             <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse" />
             System Initialized
-          </div>
+          </motion.div>
           
-          <h1 className="text-6xl md:text-8xl font-bold font-display leading-[1.1] tracking-tighter">
+          <motion.h1 variants={itemVariants} className="text-6xl md:text-8xl font-bold font-display leading-[1.1] tracking-tighter">
             <span className="block text-gray-400 text-2xl md:text-3xl mb-4 font-mono tracking-normal font-normal">Hi, I'm Akash. I build</span>
             <TextReveal text="Websites That" className="text-white" />
             <br />
             <TextReveal text="Grow Businesses" className="text-gradient" />
-          </h1>
+          </motion.h1>
           
-          <p className="text-xl text-gray-400 max-w-lg leading-relaxed font-light">
+          <motion.p variants={itemVariants} className="text-xl text-gray-400 max-w-lg leading-relaxed font-light">
             I help businesses and individuals establish a powerful online presence. From custom landing pages to full-scale web applications, I build fast, modern websites that convert visitors into customers.
-          </p>
+          </motion.p>
           
-          <div className="flex flex-wrap gap-6 pt-4">
+          <motion.div variants={itemVariants} className="flex flex-wrap gap-6 pt-4">
             <MagneticButton href="#work" className="px-8 py-4 glass-panel rounded-full font-mono text-sm uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center gap-3 group">
               <Code size={16} className="text-neon-cyan group-hover:rotate-12 transition-transform" />
               View My Work
@@ -542,7 +629,7 @@ const Hero = () => {
               <Terminal size={16} />
               Get a Free Quote
             </MagneticButton>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
       
@@ -608,6 +695,103 @@ const Services = () => {
   );
 };
 
+const Capabilities = () => {
+  const skills = [
+    {
+      title: "Frontend Architecture",
+      desc: "Building scalable, maintainable, and performant user interfaces using React, Next.js, and modern state management. I create architectures that can handle millions of users without breaking a sweat.",
+      icon: <Layout size={32} className="text-neon-cyan" />,
+      colSpan: "md:col-span-2",
+      rowSpan: "md:row-span-1",
+      glowColor: "rgba(0, 243, 255, 0.15)",
+      tags: ["React", "Next.js", "TypeScript", "Tailwind CSS"]
+    },
+    {
+      title: "Backend Systems",
+      desc: "Designing robust APIs and database architectures. From serverless functions to microservices, I build the invisible engines that power modern web applications.",
+      icon: <Database size={32} className="text-neon-purple" />,
+      colSpan: "md:col-span-1",
+      rowSpan: "md:row-span-2",
+      glowColor: "rgba(188, 19, 254, 0.15)",
+      tags: ["Node.js", "PostgreSQL", "Redis", "AWS"]
+    },
+    {
+      title: "WebGL & 3D",
+      desc: "Creating immersive, interactive 3D web experiences that push the boundaries of what's possible in a browser.",
+      icon: <Layers size={32} className="text-pink-500" />,
+      colSpan: "md:col-span-1",
+      rowSpan: "md:row-span-1",
+      glowColor: "rgba(236, 72, 153, 0.15)",
+      tags: ["Three.js", "R3F", "GLSL"]
+    },
+    {
+      title: "Performance",
+      desc: "Achieving perfect Lighthouse scores through code splitting, lazy loading, and advanced asset optimization techniques.",
+      icon: <Zap size={32} className="text-yellow-400" />,
+      colSpan: "md:col-span-1",
+      rowSpan: "md:row-span-1",
+      glowColor: "rgba(250, 204, 21, 0.15)",
+      tags: ["Web Vitals", "Lighthouse", "Caching"]
+    },
+    {
+      title: "Creative Development",
+      desc: "Bridging the gap between design and engineering with fluid animations, micro-interactions, and pixel-perfect responsive layouts.",
+      icon: <Code size={32} className="text-green-400" />,
+      colSpan: "md:col-span-2",
+      rowSpan: "md:row-span-1",
+      glowColor: "rgba(74, 222, 128, 0.15)",
+      tags: ["Framer Motion", "GSAP", "CSS Animations"]
+    }
+  ];
+
+  return (
+    <section id="capabilities" className="py-32 relative z-10 pointer-events-none">
+      <div className="max-w-7xl mx-auto px-6 pointer-events-auto">
+        <div className="mb-20 text-center">
+          <TextReveal text="Developer Arsenal" className="text-4xl md:text-6xl font-bold font-display mb-6 text-gradient" />
+          <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">Beyond standard web development</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(280px,auto)]">
+          {skills.map((skill, index) => (
+            <motion.div
+              key={skill.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ delay: index * 0.1, duration: 0.7, ease: "easeOut" }}
+              className={cn(skill.colSpan, skill.rowSpan, "h-full")}
+            >
+              <GlowCard glowColor={skill.glowColor} className="h-full flex flex-col group interactive">
+                <div className="mb-8 inline-flex p-4 rounded-2xl bg-white/5 border border-white/10 shadow-2xl group-hover:scale-110 transition-transform duration-500 group-hover:bg-white/10">
+                  {skill.icon}
+                </div>
+                
+                <div className="mt-auto">
+                  <h3 className="text-2xl md:text-3xl font-bold font-display mb-4 text-white">
+                    {skill.title}
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed font-light mb-8">
+                    {skill.desc}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-2 mt-auto">
+                    {skill.tags.map(tag => (
+                      <span key={tag} className="px-3 py-1 rounded-full bg-white/5 border border-white/10 font-mono text-xs text-gray-300 backdrop-blur-md">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </GlowCard>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const Process = () => {
   const steps = [
     {
@@ -645,7 +829,7 @@ const Process = () => {
               transition={{ duration: 0.5, delay: index * 0.2 }}
               className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active"
             >
-              <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white/20 bg-dark-surface text-neon-cyan shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[0_0_15px_rgba(0,243,255,0.2)] group-hover:scale-110 transition-transform">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white/20 bg-dark-surface text-neon-cyan shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[0_0_15px_rgba(212,175,55,0.2)] group-hover:scale-110 transition-transform">
                 <Briefcase size={16} />
               </div>
               
@@ -815,9 +999,13 @@ const Projects = () => {
                     ))}
                   </div>
                   <div className="mt-8 pointer-events-auto">
-                    <button className="px-6 py-3 bg-neon-purple/20 border border-neon-purple/50 rounded-full font-mono text-xs uppercase tracking-widest hover:bg-neon-purple hover:text-white transition-colors flex items-center gap-2">
+                    <motion.button 
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-6 py-3 bg-neon-purple/20 border border-neon-purple/50 rounded-full font-mono text-xs uppercase tracking-widest hover:bg-neon-purple hover:text-white transition-colors flex items-center gap-2 interactive"
+                    >
                       Initialize <ArrowRight size={14} />
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
 
@@ -923,10 +1111,12 @@ const FAQ = () => {
               transition={{ delay: index * 0.1 }}
               className={cn(
                 "glass-panel rounded-2xl overflow-hidden transition-colors duration-300",
-                openIndex === index ? "border-neon-cyan/50 shadow-[0_0_20px_rgba(0,243,255,0.1)]" : "border-white/10 hover:border-white/30"
+                openIndex === index ? "border-neon-cyan/50 shadow-[0_0_20px_rgba(212,175,55,0.1)]" : "border-white/10 hover:border-white/30"
               )}
             >
-              <button 
+              <motion.button 
+                whileHover={{ backgroundColor: "rgba(255,255,255,0.02)" }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full p-6 flex items-center justify-between text-left interactive"
               >
@@ -934,7 +1124,7 @@ const FAQ = () => {
                 <span className={cn("text-neon-cyan transition-transform duration-300", openIndex === index ? "rotate-180" : "")}>
                   {openIndex === index ? <Minus size={20} /> : <Plus size={20} />}
                 </span>
-              </button>
+              </motion.button>
               <AnimatePresence>
                 {openIndex === index && (
                   <motion.div
@@ -1042,10 +1232,11 @@ export default function App() {
           and re-enabled pointer-events-auto on the actual content containers inside sections */}
       <main className="pointer-events-none">
         <Hero />
+        <Projects />
         <Services />
+        <Capabilities />
         <Process />
         <SourceCode />
-        <Projects />
         <Testimonials />
         <FAQ />
         <Contact />
