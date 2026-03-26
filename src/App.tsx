@@ -211,16 +211,18 @@ const TextReveal = ({ text, className }: { text: string, className?: string }) =
   return (
     <span className={cn("inline-block", className)}>
       {words.map((word, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: i * 0.1 }}
-          className="inline-block mr-3"
-        >
-          {word}
-        </motion.span>
+        <span key={i} className="inline-block overflow-hidden">
+          <motion.span
+            initial={{ opacity: 0, y: "100%" }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: i * 0.05 }}
+            className="inline-block"
+          >
+            {word}
+          </motion.span>
+          {i < words.length - 1 && <span className="inline-block w-[0.25em]">&nbsp;</span>}
+        </span>
       ))}
     </span>
   );
@@ -328,8 +330,9 @@ const PixelEarth = ({ onHoverChange }: { onHoverChange?: (hovered: boolean) => v
     }
     
     if (groupRef.current) {
-      // Animate scale on mount (10% smaller than 1.4 = 1.26)
-      const targetScale = 1.26;
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+      // Animate scale on mount (smaller on mobile)
+      const targetScale = isMobile ? 0.65 : 1.26;
       groupRef.current.scale.x = THREE.MathUtils.damp(groupRef.current.scale.x, targetScale, 2, delta);
       groupRef.current.scale.y = THREE.MathUtils.damp(groupRef.current.scale.y, targetScale, 2, delta);
       groupRef.current.scale.z = THREE.MathUtils.damp(groupRef.current.scale.z, targetScale, 2, delta);
@@ -357,7 +360,7 @@ const PixelEarth = ({ onHoverChange }: { onHoverChange?: (hovered: boolean) => v
   });
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const boxSize = isMobile ? 0.03 : 0.022;
+  const boxSize = isMobile ? 0.025 : 0.022;
 
   return (
     <group ref={groupRef} scale={0}>
@@ -428,11 +431,12 @@ const BackgroundScene = () => {
   const [isHoveringSphere, setIsHoveringSphere] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-0 pointer-events-auto touch-none">
+    <div className="fixed inset-0 z-0 pointer-events-auto">
       <Canvas 
         camera={{ position: [0, 0, 8], fov: 45 }}
         dpr={[1, 1.5]} // Limit device pixel ratio for huge performance boost on mobile
         performance={{ min: 0.5 }} // Allow React Three Fiber to drop resolution if struggling
+        style={{ touchAction: 'pan-y' }}
       >
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
@@ -446,7 +450,7 @@ const BackgroundScene = () => {
         <OrbitControls 
           enableZoom={isHoveringSphere} 
           enablePan={false} 
-          enableRotate={true}
+          enableRotate={isHoveringSphere}
           enableDamping={true}
           dampingFactor={0.05}
           minDistance={2}
@@ -596,7 +600,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden z-10 pointer-events-none">
+    <section className="relative min-h-screen flex items-center pt-32 md:pt-20 overflow-hidden z-10 pointer-events-none">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center w-full pointer-events-none">
         <motion.div 
           variants={containerVariants}
@@ -609,11 +613,11 @@ const Hero = () => {
             System Initialized
           </motion.div>
           
-          <motion.h1 variants={itemVariants} className="text-7xl md:text-[120px] font-bold font-display leading-[0.85] tracking-[-0.05em]">
-            <span className="block text-gray-500 text-xl md:text-2xl mb-8 font-mono tracking-widest font-normal uppercase">Hi, I'm Akash. I build</span>
-            <TextReveal text="Websites That" className="text-white" />
-            <br />
-            <TextReveal text="Grow Businesses" className="text-gradient" />
+          <motion.h1 variants={itemVariants} className="text-4xl sm:text-5xl md:text-[90px] font-bold font-display leading-[1.1] md:leading-[0.9] tracking-[-0.04em]">
+            <span className="block text-gray-500 text-sm sm:text-lg md:text-xl mb-4 md:mb-6 font-mono tracking-widest font-normal uppercase">I'm akash sah</span>
+            <TextReveal text="WEBSITE FOR YOU AND YOUR BUSINESS" className="text-white" />
+            <br className="hidden md:block" />
+            <TextReveal text="Grow Businesses" className="text-gradient block mt-2 md:mt-0" />
           </motion.h1>
           
           <motion.p variants={itemVariants} className="text-lg md:text-xl text-gray-400 max-w-lg leading-relaxed font-light tracking-wide">
